@@ -1,0 +1,6 @@
+.pio
+.vscode
+hex/*.hex
+hex/*.lss
+RV32I*/
+compile_commands.json
