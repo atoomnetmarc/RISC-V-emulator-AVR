@@ -19,7 +19,7 @@
 volatile uart_fifo_t tx_fifo = {0};
 volatile uart_fifo_t rx_fifo = {0};
 
-inline void enable_udrie(void) {
+static inline void enable_udrie(void) {
 #if (defined(UCR))
     UCR |= _BV(UDRIE);
 #elif (defined(UCSRB))
@@ -31,7 +31,7 @@ inline void enable_udrie(void) {
 #endif
 }
 
-inline void disable_udrie(void) {
+static inline void disable_udrie(void) {
 #if (defined(UCR))
     UCR &= ~_BV(UDRIE);
 #elif (defined(UCSRB))
