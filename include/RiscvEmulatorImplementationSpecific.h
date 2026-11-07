@@ -6,6 +6,7 @@
  */
 
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 #include <avr/pgmspace.h>
@@ -55,22 +56,23 @@ void RiscvEmulatorDisasmPrintf(const char *fmt, ...) {
  * @param address The byte address in memory.
  * @param destination The destination address to copy the data to.
  * @param length The length in bytes of the data.
+ * @return true when the address is mapped, false otherwise.
  */
-extern inline void RiscvEmulatorLoad(uint32_t address, void *destination, uint8_t length) {
+extern inline bool RiscvEmulatorLoad(uint32_t address, void *destination, uint8_t length) {
     if (address >= RAM_ORIGIN) {
 #if (RVE_AVR_E_ACT == 1)
         act_load(address - RAM_ORIGIN, destination, length);
 #else
         psram_read(address - RAM_ORIGIN, destination, length);
 #endif
-        return;
+        return true;
     }
 
     if (address >= ROM_ORIGIN) {
 #if (RVE_AVR_E_ACT == 0)
         flash_read(address - ROM_ORIGIN, destination, length);
 #endif
-        return;
+        return true;
     }
 
     if (address >= UART_ORIGIN) {
@@ -87,7 +89,7 @@ extern inline void RiscvEmulatorLoad(uint32_t address, void *destination, uint8_
             };
             *(uint8_t *)destination = lineStatus.value;
         }
-        return;
+        return true;
     }
 
     if (address >= IO_ORIGIN) {
@@ -97,8 +99,10 @@ extern inline void RiscvEmulatorLoad(uint32_t address, void *destination, uint8_
         } else if (length == 2) {
             *(uint16_t *)destination = _SFR_IO16(ioaddress);
         }
-        return;
+        return true;
     }
+
+    return false;
 }
 
 /**
@@ -107,15 +111,16 @@ extern inline void RiscvEmulatorLoad(uint32_t address, void *destination, uint8_
  * @param address The byte address in memory.
  * @param destination The destination address to copy the data to.
  * @param length The length in bytes of the data.
+ * @return true when the address is mapped, false otherwise.
  */
-extern inline void RiscvEmulatorStore(uint32_t address, const void *source, uint8_t length) {
+extern inline bool RiscvEmulatorStore(uint32_t address, const void *source, uint8_t length) {
     if (address >= RAM_ORIGIN) {
 #if (RVE_AVR_E_ACT == 1)
         act_store(address - RAM_ORIGIN, source, length);
 #else
         psram_write(address - RAM_ORIGIN, source, length);
 #endif
-        return;
+        return true;
     }
 
     if (address >= ROM_ORIGIN) {
@@ -123,7 +128,7 @@ extern inline void RiscvEmulatorStore(uint32_t address, const void *source, uint
         // Nothing is mapped in the ROM region in ACT mode; a store there is
         // a halt attempt at a non-AVR halt address.
         if (act_halt(address, source, length)) {
-            return;
+            return true;
         }
 #endif
 #if (RVE_AVR_E_VERBOSE == 1)
@@ -132,7 +137,7 @@ extern inline void RiscvEmulatorStore(uint32_t address, const void *source, uint
         for (;;) {
             asm volatile("BREAK");
         };
-        return;
+        return true;
     }
 
     if (address >= UART_ORIGIN) {
@@ -141,14 +146,14 @@ extern inline void RiscvEmulatorStore(uint32_t address, const void *source, uint
         if (address == UART_ORIGIN) {
             uart_putc(*(uint8_t *)source, NULL);
         }
-        return;
+        return true;
     }
 
     if (address >= IO_ORIGIN) {
         uint32_t ioaddress = address - IO_ORIGIN;
 #if (RVE_AVR_E_ACT == 1)
         if (act_halt(address, source, length)) {
-            return;
+            return true;
         }
 #endif
         if (length == 1) {
@@ -156,8 +161,10 @@ extern inline void RiscvEmulatorStore(uint32_t address, const void *source, uint
         } else if (length == 2) {
             _SFR_IO16(ioaddress) = *(uint16_t *)source;
         }
-        return;
+        return true;
     }
+
+    return false;
 }
 
 /**
@@ -180,26 +187,15 @@ extern inline void RiscvEmulatorIllegalInstruction(RiscvEmulatorState_t *state) 
 }
 
 /**
- * Handles a fault where the CSR is not recognized.
- */
-#if (RVE_E_ZICSR == 1)
-extern inline void RiscvEmulatorUnknownCSR(RiscvEmulatorState_t *state) {
-#if (RVE_AVR_E_VERBOSE == 1)
-    printf_P(PSTR("Unknown CSR 0x%04" PRIX16 " at 0x%08" PRIX32 ". Stop.\n"),
-             state->instruction.itypecsr.csr,
-             state->programcounter);
-#endif
-
-    for (;;) {
-        asm volatile("BREAK");
-    };
-}
-#endif
-
-/**
  * Handles an ECALL.
  */
 extern inline void RiscvEmulatorHandleECALL(RiscvEmulatorState_t *state) {
+#if (RVE_E_ZICSR == 1)
+    if (state->csr.mtvec.base != 0) {
+        return;
+    }
+#endif
+
 #if (RVE_AVR_E_VERBOSE == 1)
     printf_P(PSTR("ECALL at 0x%08" PRIX32 ". Stop.\n"),
              state->programcounter);
