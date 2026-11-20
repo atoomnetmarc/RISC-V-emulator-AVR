@@ -27,6 +27,7 @@
 #define VPI_RX_LEN   _SFR_IO8(0x1E)  // 0x3E
 #define VPI_RX_DATA  _SFR_IO8(0x1F)  // 0x3F
 #define VPI_EXIT     _SFR_IO8(0x19)  // 0x39
+#define VPI_SNAPSHOT _SFR_MEM8(0x62) // 0x62
 
 #define VPI_EXIT_PASS   0
 #define VPI_EXIT_FAIL   1
@@ -50,8 +51,24 @@
 #define VPI_CALL_RTC_MONOTONIC 9
 #define VPI_CALL_TIME_SOURCE   10
 #define VPI_CALL_DISK_CAPACITY 11
+#define VPI_CALL_STATE_SAVE    12
 
 #define VPI_SCRATCH_SIZE 4096
+
+/**
+ * Returns the pending host snapshot request: 0 none, 1 save, 2 load.
+ */
+uint8_t vpi_snapshot_request(void);
+
+/**
+ * Clears the pending host snapshot request.
+ */
+void vpi_snapshot_acknowledge(void);
+
+/**
+ * Notifies the host that the snapshot blob is ready in guest RAM.
+ */
+void vpi_state_saved(void);
 
 /**
  * Reads length bytes from the VPI-backed guest RAM at the given offset.

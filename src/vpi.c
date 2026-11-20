@@ -89,6 +89,18 @@ static void vpi_scratch_read(void *buffer, uint16_t length) {
     VPI_SPACE = VPI_SPACE_RAM;
 }
 
+uint8_t vpi_snapshot_request(void) {
+    return VPI_SNAPSHOT;
+}
+
+void vpi_snapshot_acknowledge(void) {
+    VPI_SNAPSHOT = 0;
+}
+
+void vpi_state_saved(void) {
+    VPI_CALL = VPI_CALL_STATE_SAVE;
+}
+
 void vpi_load(uint32_t offset, void *destination, uint16_t length) {
     uint8_t *bytes = (uint8_t *)destination;
     vpi_set_address(offset);

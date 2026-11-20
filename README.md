@@ -81,6 +81,8 @@ The `[env:ATmega1284P_linux-mmu]` and `[env:ATmega1284P_linux-mmu-max]` environm
 
 These envs are separate from the other AVR envs so Sv32 and the Linux ISA set do not grow them. They set `RVE_AVR_E_LINUX=1`, which selects 64 MiB of VPI-backed RAM and the platform devices from [RISC-V-emulator-Devices](../RISC-V-emulator-Devices): CLINT, 16550 UART, PLIC, SYSCON and virtio. The firmware passes the hart ID in `a0` and the DTB address `0x82200000` in `a1`, and starts at `0x80000000`. Host services such as disk I/O, console output, entropy and time cross the AVR/simavr boundary through the VPI host-call contract in [docs/vpi-host-calls.md](../RISC-V-emulator-SimAVR/docs/vpi-host-calls.md). Guest poweroff and reboot write the VPI exit register, so the host stops cleanly. The host runs without a timeout unless `-T <seconds>` is given.
 
+These envs also pack their CPU and device state into the reserved top 4 KiB of guest RAM on a host snapshot request. `simavr-host -S <prefix>` writes a snapshot on `SIGUSR1`, and `simavr-host -R <prefix>` restores one written by Native or SimAVR.
+
 # License
 
 I license my code Apache License, Version 2.0.

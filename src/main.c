@@ -29,10 +29,15 @@
 
 #if (RVE_AVR_E_LINUX == 1)
 #include "linux.h"
+#include "snapshot.h"
 #include "vpi.h"
 #endif
 
 RiscvEmulatorState_t RiscvEmulatorState;
+#if (RVE_AVR_E_LINUX == 1)
+uint64_t RiscvEmulatorInstructionCount;
+#endif
+
 __attribute__((OS_main)) int main(void) {
 #if (RVE_AVR_E_ACT == 0) && (RVE_AVR_E_LINUX == 0)
     led_init();
@@ -199,8 +204,12 @@ __attribute__((OS_main)) int main(void) {
 #endif
 #if (RVE_AVR_E_LINUX == 1)
         linux_tick(&RiscvEmulatorState);
+        snapshot_poll();
 #endif
         RiscvEmulatorLoop(&RiscvEmulatorState);
+#if (RVE_AVR_E_LINUX == 1)
+        RiscvEmulatorInstructionCount++;
+#endif
 
 #if (RVE_AVR_E_ACT == 1)
         act_count_instruction();
