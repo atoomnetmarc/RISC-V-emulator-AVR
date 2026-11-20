@@ -27,10 +27,14 @@
 #include "tft.h"
 #include "uart.h"
 
-RiscvEmulatorState_t RiscvEmulatorState;
+#if (RVE_AVR_E_LINUX == 1)
+#include "linux.h"
+#include "vpi.h"
+#endif
 
+RiscvEmulatorState_t RiscvEmulatorState;
 __attribute__((OS_main)) int main(void) {
-#if (RVE_AVR_E_ACT == 0)
+#if (RVE_AVR_E_ACT == 0) && (RVE_AVR_E_LINUX == 0)
     led_init();
 #endif
 
@@ -43,7 +47,7 @@ __attribute__((OS_main)) int main(void) {
     act_init();
 #endif
 
-#if (RVE_AVR_E_ACT == 0)
+#if (RVE_AVR_E_ACT == 0) && (RVE_AVR_E_LINUX == 0)
 
 #if (RVE_AVR_E_VERBOSE == 1)
     printf_P(PSTR("Initialize SPI\n"));
@@ -181,9 +185,20 @@ __attribute__((OS_main)) int main(void) {
     RiscvEmulatorState.programcounternext = RAM_ORIGIN;
 #endif
 
+#if (RVE_AVR_E_LINUX == 1)
+    linux_init();
+    RiscvEmulatorState.reg.a0 = 0;
+    RiscvEmulatorState.reg.a1 = RVE_AVR_E_DTB_ADDRESS;
+    RiscvEmulatorState.programcounter = RVE_AVR_E_START_ADDRESS;
+    RiscvEmulatorState.programcounternext = RVE_AVR_E_START_ADDRESS;
+#endif
+
     for (;;) {
-#if (RVE_AVR_E_ACT == 0)
+#if (RVE_AVR_E_ACT == 0) && (RVE_AVR_E_LINUX == 0)
         PORTA ^= _BV(PA0);
+#endif
+#if (RVE_AVR_E_LINUX == 1)
+        linux_tick(&RiscvEmulatorState);
 #endif
         RiscvEmulatorLoop(&RiscvEmulatorState);
 

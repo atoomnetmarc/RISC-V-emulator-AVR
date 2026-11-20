@@ -32,6 +32,25 @@
 #endif
 #endif
 
+#if (RVE_AVR_E_LINUX == 1)
+// Linux mode runs under simavr with 64 MiB of VPI-backed RAM. OpenSBI starts
+// at RAM_ORIGIN and the DTB is loaded at RVE_AVR_E_DTB_ADDRESS.
+#define RVE_AVR_E_START_ADDRESS RAM_ORIGIN
+#define RVE_AVR_E_RAM_LENGTH    0x4000000 // 64 MiB
+#define RVE_AVR_E_DTB_ADDRESS   0x82200000
+#ifndef RVE_AVR_E_VERBOSE
+#define RVE_AVR_E_VERBOSE 1
+#endif
+
+#ifndef RVE_AVR_E_FATFS
+#define RVE_AVR_E_FATFS 0
+#endif
+
+#ifndef RVE_AVR_E_TFT
+#define RVE_AVR_E_TFT 0
+#endif
+#endif
+
 // Set features based on flash size
 #if FLASHEND > 8192
 #ifndef RVE_AVR_E_VERBOSE

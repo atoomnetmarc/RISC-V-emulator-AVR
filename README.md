@@ -75,6 +75,12 @@ For debugging failing tests, `[env:ATmega1284P_ACT_DISASM]` builds the same firm
 
 In this mode the emulator can run the official RISC-V ACT test suites: the RISC-V binary is loaded into the VPI-backed RAM, which is accessed via `act_load()`/`act_store()` ([include/act.h](include/act.h)), and a store to the halt region signals pass or fail (`RVMODEL_HALT_PASS`/`RVMODEL_HALT_FAIL`). This environment is used for compliance testing.
 
+# Linux boot envs
+
+The `[env:ATmega1284P_linux-mmu]` and `[env:ATmega1284P_linux-mmu-max]` environments in [platformio.ini](platformio.ini) build the emulator with the ISA sets that OpenSBI and Linux need. The minimal env enables M, A, Zicsr, Zifencei, Zicntr and Sv32; the maximal env adds C and the Zba, Zbb, Zbkb, Zbkc, Zbkx, Zbs, Zcb, Zcmop, Zicond, Zihintntl, Zihintpause and Zimop subsets. Both enable misaligned loads and stores. The ISA sets mirror the `RV32I-linux-mmu` and `RV32I-linux-mmu-max` envs in the Native project.
+
+These envs are separate from the other AVR envs so Sv32 and the Linux ISA set do not grow them. They set `RVE_AVR_E_LINUX=1`, which selects 64 MiB of VPI-backed RAM and the platform devices from [RISC-V-emulator-Devices](../RISC-V-emulator-Devices): CLINT, 16550 UART, PLIC, SYSCON and virtio. The firmware passes the hart ID in `a0` and the DTB address `0x82200000` in `a1`, and starts at `0x80000000`. Host services such as disk I/O, console output, entropy and time cross the AVR/simavr boundary through the VPI host-call contract in [docs/vpi-host-calls.md](../RISC-V-emulator-SimAVR/docs/vpi-host-calls.md). Guest poweroff and reboot write the VPI exit register, so the host stops cleanly. The host runs without a timeout unless `-T <seconds>` is given.
+
 # License
 
 I license my code Apache License, Version 2.0.
