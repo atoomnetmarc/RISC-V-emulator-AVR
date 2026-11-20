@@ -175,9 +175,11 @@ uint64_t vpi_rtc_monotonic_ns(void) {
 }
 
 // The AVR executes roughly 2000 RISC-V instructions per second, three orders
-// of magnitude slower than Native. CLINT time must advance at a comparable
-// rate or the guest kernel spends all its instructions servicing timer ticks.
-#define RVE_AVR_TIME_SCALE 1000u
+// of magnitude slower than Native. Linux envs slow CLINT time to match so the
+// guest kernel does not spend all its instructions servicing timer ticks.
+#ifndef RVE_AVR_TIME_SCALE
+#define RVE_AVR_TIME_SCALE 1u
+#endif
 
 uint64_t vpi_time_source(void) {
     VPI_CALL = VPI_CALL_TIME_SOURCE;
