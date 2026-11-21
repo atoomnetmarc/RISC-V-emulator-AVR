@@ -203,6 +203,10 @@ __attribute__((OS_main)) int main(void) {
         PORTA ^= _BV(PA0);
 #endif
 #if (RVE_AVR_E_LINUX == 1)
+        // RiscvEmulatorLoop() changes waiting; force a fresh read each pass.
+        if (*(volatile uint8_t *)&RiscvEmulatorState.waiting != 0) {
+            linux_idle();
+        }
         linux_tick(&RiscvEmulatorState);
         snapshot_poll();
 #endif

@@ -94,4 +94,14 @@ void linux_tick(RiscvEmulatorState_t *state);
  */
 uint64_t linux_time_source(void);
 
+/**
+ * Starts the 10 ms Timer0 compare interrupt used to wake the AVR from idle.
+ */
+void linux_idle_init(void);
+
+/**
+ * Parks the AVR in idle sleep until an interrupt wakes it.
+ */
+void linux_idle(void);
+
 #endif /* LINUX_H_ */

@@ -9,6 +9,9 @@
 
 #include "linux.h"
 
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <avr/sleep.h>
 #include <string.h>
 
 #include "defines.h"
@@ -24,6 +27,9 @@ virtio_rng_t virtio_rng;
 goldfish_rtc_t goldfish_rtc;
 
 static const uint8_t net_mac[6] = {0x02, 0x00, 0x00, 0x00, 0x00, 0x01};
+
+// 20 MHz / 1024 / (194 + 1) = 100.16 Hz, close enough to a 10 ms wake tick.
+#define IDLE_TICK_OCR0A 194u
 
 // Pause host input before the 16-byte guest FIFO fills, and resume with
 // hysteresis so a single byte does not toggle the signal on every tick.
@@ -47,6 +53,7 @@ void linux_init(void) {
     virtio_rng_init(&virtio_rng, VIRTIO_RNG_ORIGIN, VIRTIO_RNG_SIZE, NULL,
                     RAM_ORIGIN, RVE_AVR_E_RAM_LENGTH);
     goldfish_rtc_init(&goldfish_rtc, GOLDFISH_RTC_ORIGIN, GOLDFISH_RTC_SIZE);
+    linux_idle_init();
 }
 
 bool linux_load(uint32_t address, void *destination, uint8_t length) {
@@ -158,6 +165,22 @@ void linux_tick(RiscvEmulatorState_t *state) {
 
 uint64_t linux_time_source(void) {
     return clint.mtime;
+}
+
+void linux_idle_init(void) {
+    TCCR0A = _BV(WGM01);
+    OCR0A = IDLE_TICK_OCR0A;
+    TCCR0B = _BV(CS02) | _BV(CS00);
+    TIMSK0 |= _BV(OCIE0A);
+}
+
+ISR(TIMER0_COMPA_vect) {
+}
+
+void linux_idle(void) {
+    sleep_enable();
+    sleep_cpu();
+    sleep_disable();
 }
 
 #endif
