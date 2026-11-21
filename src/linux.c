@@ -25,6 +25,13 @@ goldfish_rtc_t goldfish_rtc;
 
 static const uint8_t net_mac[6] = {0x02, 0x00, 0x00, 0x00, 0x00, 0x01};
 
+// Pause host input before the 16-byte guest FIFO fills, and resume with
+// hysteresis so a single byte does not toggle the signal on every tick.
+#define UART_FLOW_XOFF_LEVEL 12u
+#define UART_FLOW_XON_LEVEL  4u
+
+static bool uart_flow_paused;
+
 void linux_init(void) {
     syscon_init(&syscon, SYSCON_ORIGIN, SYSCON_SIZE);
     clint_init(&clint, CLINT_ORIGIN, CLINT_SIZE);
@@ -109,6 +116,14 @@ void linux_tick(RiscvEmulatorState_t *state) {
         uint8_t byte = vpi_rx_read();
         uart16550_rx_push(&uart, byte);
         virtio_console_rx_push(&virtio_console, byte);
+    }
+
+    if (!uart_flow_paused && uart.fifo_count >= UART_FLOW_XOFF_LEVEL) {
+        uart_flow_paused = true;
+        vpi_uart_flow(1);
+    } else if (uart_flow_paused && uart.fifo_count <= UART_FLOW_XON_LEVEL) {
+        uart_flow_paused = false;
+        vpi_uart_flow(0);
     }
 
     clint_tick(&clint, vpi_time_source());

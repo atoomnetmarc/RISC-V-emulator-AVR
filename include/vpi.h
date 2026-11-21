@@ -52,6 +52,7 @@
 #define VPI_CALL_TIME_SOURCE   10
 #define VPI_CALL_DISK_CAPACITY 11
 #define VPI_CALL_STATE_SAVE    12
+#define VPI_CALL_UART_FLOW     13
 
 #define VPI_SCRATCH_SIZE 4096
 
@@ -84,6 +85,11 @@ void vpi_store(uint32_t offset, const void *source, uint16_t length);
  * Transmits one byte on the host console.
  */
 void vpi_uart_tx(uint8_t byte);
+
+/**
+ * Pauses or resumes host input for the guest UART.
+ */
+void vpi_uart_flow(uint8_t paused);
 
 /**
  * Transmits a buffer on the host console.

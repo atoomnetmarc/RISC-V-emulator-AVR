@@ -122,6 +122,11 @@ void vpi_uart_tx(uint8_t byte) {
     VPI_CALL = VPI_CALL_UART_TX;
 }
 
+void vpi_uart_flow(uint8_t paused) {
+    vpi_arg_u8(paused);
+    VPI_CALL = VPI_CALL_UART_FLOW;
+}
+
 void vpi_console_tx(const void *buffer, uint16_t length) {
     vpi_scratch_write(buffer, length);
     vpi_arg_u16(length);
