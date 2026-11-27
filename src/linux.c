@@ -5,7 +5,7 @@
  *
  */
 
-#if (RVE_AVR_E_LINUX == 1)
+#if (RVE_AVR_LINUX == 1)
 
 #include "linux.h"
 
@@ -45,13 +45,13 @@ void linux_init(void) {
     uart16550_init(&uart, UART_ORIGIN, UART_SIZE);
     plic_init(&plic, PLIC_ORIGIN, PLIC_SIZE);
     virtio_blk_init(&virtio_blk, VIRTIO_BLK_ORIGIN, VIRTIO_BLK_SIZE, NULL,
-                    RAM_ORIGIN, RVE_AVR_E_RAM_LENGTH, vpi_disk_capacity());
+                    RAM_ORIGIN, RVE_AVR_RAM_LENGTH, vpi_disk_capacity());
     virtio_console_init(&virtio_console, VIRTIO_CONSOLE_ORIGIN, VIRTIO_CONSOLE_SIZE,
-                        NULL, RAM_ORIGIN, RVE_AVR_E_RAM_LENGTH);
+                        NULL, RAM_ORIGIN, RVE_AVR_RAM_LENGTH);
     virtio_net_init(&virtio_net, VIRTIO_NET_ORIGIN, VIRTIO_NET_SIZE, NULL,
-                    RAM_ORIGIN, RVE_AVR_E_RAM_LENGTH, net_mac);
+                    RAM_ORIGIN, RVE_AVR_RAM_LENGTH, net_mac);
     virtio_rng_init(&virtio_rng, VIRTIO_RNG_ORIGIN, VIRTIO_RNG_SIZE, NULL,
-                    RAM_ORIGIN, RVE_AVR_E_RAM_LENGTH);
+                    RAM_ORIGIN, RVE_AVR_RAM_LENGTH);
     goldfish_rtc_init(&goldfish_rtc, GOLDFISH_RTC_ORIGIN, GOLDFISH_RTC_SIZE);
     linux_idle_init();
 }

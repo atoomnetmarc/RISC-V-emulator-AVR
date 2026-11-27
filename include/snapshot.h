@@ -6,7 +6,7 @@
 #ifndef Snapshot_H_
 #define Snapshot_H_
 
-#if (RVE_AVR_E_LINUX == 1)
+#if (RVE_AVR_LINUX == 1)
 
 /**
  * Handles a pending host snapshot request.

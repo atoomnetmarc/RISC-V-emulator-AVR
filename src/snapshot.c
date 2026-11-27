@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#if (RVE_AVR_E_LINUX == 1)
+#if (RVE_AVR_LINUX == 1)
 
 #include "snapshot.h"
 
@@ -35,12 +35,12 @@ extern goldfish_rtc_t goldfish_rtc;
 /**
  * Copies a 32-bit value into a packed CSR field by byte offset.
  */
-#if (RVE_E_ZICSR == 1)
+#if (RVE_E_Zicsr == 1)
 static void csr_set_u32(size_t offset, uint32_t value) {
     memcpy((uint8_t *)&RiscvEmulatorState.csr + offset, &value, sizeof(value));
 }
 
-#if (RVE_E_ZICNTR == 1)
+#if (RVE_E_Zicntr == 1)
 /**
  * Copies a 64-bit value into a packed CSR field by byte offset.
  */
@@ -119,10 +119,10 @@ static void snapshot_pack(rve_snapshot_t *blob) {
     blob->isa_m = RVE_E_M;
     blob->isa_a = RVE_E_A;
     blob->isa_c = RVE_E_C;
-    blob->isa_zicsr = RVE_E_ZICSR;
-    blob->isa_zicntr = RVE_E_ZICNTR;
-    blob->isa_sv32 = RVE_E_SV32;
-    blob->isa_zalrsc = RVE_E_ZALRSC;
+    blob->isa_zicsr = RVE_E_Zicsr;
+    blob->isa_zicntr = RVE_E_Zicntr;
+    blob->isa_sv32 = RVE_E_Sv32;
+    blob->isa_zalrsc = RVE_E_Zalrsc;
 
     blob->cpu_pc = RiscvEmulatorState.programcounter;
     blob->cpu_next_pc = RiscvEmulatorState.programcounternext;
@@ -134,18 +134,18 @@ static void snapshot_pack(rve_snapshot_t *blob) {
     for (uint8_t i = 0; i < 32; i++) {
         blob->reg[i] = RiscvEmulatorState.reg.x[i];
     }
-#if (RVE_E_ZALRSC == 1)
+#if (RVE_E_Zalrsc == 1)
     blob->cpu_reservation_valid = RiscvEmulatorState.reservationvalid;
     blob->cpu_reservation_address = RiscvEmulatorState.reservationaddress;
 #endif
-#if (RVE_E_HOOK == 1 || RVE_E_DISASM == 1)
+#if (RVE_FEATURE_HOOK == 1 || RVE_FEATURE_DISASM == 1)
     blob->cpu_instruction_handled = RiscvEmulatorState.instructionhandled;
 #endif
-#if (RVE_E_ZICSR == 1)
+#if (RVE_E_Zicsr == 1)
     blob->cpu_privilege = RiscvEmulatorState.privilege;
     blob->cpu_waiting = RiscvEmulatorState.waiting;
     blob->cpu_wfi_timeout = RiscvEmulatorState.wfi_timeout;
-#if (RVE_E_ZICNTR == 1)
+#if (RVE_E_Zicntr == 1)
     blob->cpu_counter_written = RiscvEmulatorState.counterwritten;
 #endif
 #define PACK_CSR32(field)                                                                      \
@@ -186,7 +186,7 @@ static void snapshot_pack(rve_snapshot_t *blob) {
     PACK_CSR32(zeroreg);
     PACK_CSR32(mcounteren);
 #undef PACK_CSR32
-#if (RVE_E_ZICNTR == 1)
+#if (RVE_E_Zicntr == 1)
 #define PACK_CSR64(field)                                                                      \
     do {                                                                                       \
         uint64_t value;                                                                        \
@@ -263,18 +263,18 @@ static void snapshot_unpack(const rve_snapshot_t *blob) {
     for (uint8_t i = 0; i < 32; i++) {
         RiscvEmulatorState.reg.x[i] = blob->reg[i];
     }
-#if (RVE_E_ZALRSC == 1)
+#if (RVE_E_Zalrsc == 1)
     RiscvEmulatorState.reservationvalid = blob->cpu_reservation_valid;
     RiscvEmulatorState.reservationaddress = blob->cpu_reservation_address;
 #endif
-#if (RVE_E_HOOK == 1 || RVE_E_DISASM == 1)
+#if (RVE_FEATURE_HOOK == 1 || RVE_FEATURE_DISASM == 1)
     RiscvEmulatorState.instructionhandled = blob->cpu_instruction_handled;
 #endif
-#if (RVE_E_ZICSR == 1)
+#if (RVE_E_Zicsr == 1)
     RiscvEmulatorState.privilege = blob->cpu_privilege;
     RiscvEmulatorState.waiting = blob->cpu_waiting;
     RiscvEmulatorState.wfi_timeout = blob->cpu_wfi_timeout;
-#if (RVE_E_ZICNTR == 1)
+#if (RVE_E_Zicntr == 1)
     RiscvEmulatorState.counterwritten = blob->cpu_counter_written;
 #endif
 #define UNPACK_CSR32(field) csr_set_u32(offsetof(RiscvCSR_t, field), blob->csr_##field)
@@ -309,7 +309,7 @@ static void snapshot_unpack(const rve_snapshot_t *blob) {
     UNPACK_CSR32(zeroreg);
     UNPACK_CSR32(mcounteren);
 #undef UNPACK_CSR32
-#if (RVE_E_ZICNTR == 1)
+#if (RVE_E_Zicntr == 1)
 #define UNPACK_CSR64(field) csr_set_u64(offsetof(RiscvCSR_t, field), blob->csr_##field)
     UNPACK_CSR64(cycle);
     UNPACK_CSR64(time);

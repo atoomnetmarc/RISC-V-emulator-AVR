@@ -12,7 +12,7 @@
 #ifndef TFT_H_
 #define TFT_H_
 
-#if RVE_AVR_E_TFT == 1
+#if RVE_AVR_TFT == 1
 
 void tft_bl(uint8_t level);
 void tft_clear(uint16_t color);

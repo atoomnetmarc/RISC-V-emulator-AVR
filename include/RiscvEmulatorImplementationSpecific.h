@@ -20,14 +20,14 @@
 #include "psram.h"
 #include "uart.h"
 
-#if (RVE_AVR_E_ACT == 1)
+#if (RVE_AVR_ACT == 1)
 #include "act.h"
-#elif (RVE_AVR_E_LINUX == 1)
+#elif (RVE_AVR_LINUX == 1)
 #include "linux.h"
 #include "vpi.h"
 #endif
 
-#if (RVE_AVR_E_LINUX == 1)
+#if (RVE_AVR_LINUX == 1)
 #define RVE_TIME_SOURCE(state) linux_time_source()
 #endif
 
@@ -41,7 +41,7 @@
  */
 #define RVE_DISASM_FMT(s) PSTR(s)
 
-#if (RVE_AVR_E_ACT == 1) && (RVE_E_DISASM == 1)
+#if (RVE_AVR_ACT == 1) && (RVE_FEATURE_DISASM == 1)
 /**
  * ACT mode instruction tracing. The library renders each instruction via the
  * shape functions; this override sends the fragments (format strings stored
@@ -65,11 +65,11 @@ void RiscvEmulatorDisasmPrintf(const char *fmt, ...) {
  * @return true when the address is mapped, false otherwise.
  */
 extern inline bool RiscvEmulatorLoad(uint32_t address, void *destination, uint8_t length) {
-#if (RVE_AVR_E_LINUX == 1)
+#if (RVE_AVR_LINUX == 1)
     if (linux_load(address, destination, length)) {
         return true;
     }
-    if (address >= RAM_ORIGIN && address < RAM_ORIGIN + RVE_AVR_E_RAM_LENGTH) {
+    if (address >= RAM_ORIGIN && address < RAM_ORIGIN + RVE_AVR_RAM_LENGTH) {
         vpi_load(address - RAM_ORIGIN, destination, length);
         return true;
     }
@@ -77,7 +77,7 @@ extern inline bool RiscvEmulatorLoad(uint32_t address, void *destination, uint8_
 #endif
 
     if (address >= RAM_ORIGIN) {
-#if (RVE_AVR_E_ACT == 1)
+#if (RVE_AVR_ACT == 1)
         act_load(address - RAM_ORIGIN, destination, length);
 #else
         psram_read(address - RAM_ORIGIN, destination, length);
@@ -86,7 +86,7 @@ extern inline bool RiscvEmulatorLoad(uint32_t address, void *destination, uint8_
     }
 
     if (address >= ROM_ORIGIN) {
-#if (RVE_AVR_E_ACT == 0)
+#if (RVE_AVR_ACT == 0)
         flash_read(address - ROM_ORIGIN, destination, length);
 #endif
         return true;
@@ -131,11 +131,11 @@ extern inline bool RiscvEmulatorLoad(uint32_t address, void *destination, uint8_
  * @return true when the address is mapped, false otherwise.
  */
 extern inline bool RiscvEmulatorStore(uint32_t address, const void *source, uint8_t length) {
-#if (RVE_AVR_E_LINUX == 1)
+#if (RVE_AVR_LINUX == 1)
     if (linux_store(address, source, length)) {
         return true;
     }
-    if (address >= RAM_ORIGIN && address < RAM_ORIGIN + RVE_AVR_E_RAM_LENGTH) {
+    if (address >= RAM_ORIGIN && address < RAM_ORIGIN + RVE_AVR_RAM_LENGTH) {
         vpi_store(address - RAM_ORIGIN, source, length);
         return true;
     }
@@ -143,7 +143,7 @@ extern inline bool RiscvEmulatorStore(uint32_t address, const void *source, uint
 #endif
 
     if (address >= RAM_ORIGIN) {
-#if (RVE_AVR_E_ACT == 1)
+#if (RVE_AVR_ACT == 1)
         act_store(address - RAM_ORIGIN, source, length);
 #else
         psram_write(address - RAM_ORIGIN, source, length);
@@ -152,14 +152,14 @@ extern inline bool RiscvEmulatorStore(uint32_t address, const void *source, uint
     }
 
     if (address >= ROM_ORIGIN) {
-#if (RVE_AVR_E_ACT == 1)
+#if (RVE_AVR_ACT == 1)
         // Nothing is mapped in the ROM region in ACT mode; a store there is
         // a halt attempt at a non-AVR halt address.
         if (act_halt(address, source, length)) {
             return true;
         }
 #endif
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
         printf_P(PSTR("There was a write to ROM. ROM cannot be written. Stop.\n"));
 #endif
         for (;;) {
@@ -179,7 +179,7 @@ extern inline bool RiscvEmulatorStore(uint32_t address, const void *source, uint
 
     if (address >= IO_ORIGIN) {
         uint32_t ioaddress = address - IO_ORIGIN;
-#if (RVE_AVR_E_ACT == 1)
+#if (RVE_AVR_ACT == 1)
         if (act_halt(address, source, length)) {
             return true;
         }
@@ -203,11 +203,11 @@ extern inline bool RiscvEmulatorStore(uint32_t address, const void *source, uint
  * The failed machine instruction is found in state.instruction.value.
  */
 extern inline void RiscvEmulatorIllegalInstruction(RiscvEmulatorState_t *state) {
-#if (RVE_AVR_E_LINUX == 1)
+#if (RVE_AVR_LINUX == 1)
     (void)state;
     return;
 #endif
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
     printf_P(PSTR("Illegal instruction 0x%08" PRIX32 " at 0x%08" PRIX32 ". Stop.\n"),
              state->instruction.value,
              state->programcounter);
@@ -222,17 +222,17 @@ extern inline void RiscvEmulatorIllegalInstruction(RiscvEmulatorState_t *state) 
  * Handles an ECALL.
  */
 extern inline void RiscvEmulatorHandleECALL(RiscvEmulatorState_t *state) {
-#if (RVE_AVR_E_LINUX == 1)
+#if (RVE_AVR_LINUX == 1)
     (void)state;
     return;
 #endif
-#if (RVE_E_ZICSR == 1)
+#if (RVE_E_Zicsr == 1)
     if (state->csr.mtvec.base != 0) {
         return;
     }
 #endif
 
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
     printf_P(PSTR("ECALL at 0x%08" PRIX32 ". Stop.\n"),
              state->programcounter);
 #endif
@@ -246,11 +246,11 @@ extern inline void RiscvEmulatorHandleECALL(RiscvEmulatorState_t *state) {
  * Handles an EBREAK.
  */
 extern inline void RiscvEmulatorHandleEBREAK(RiscvEmulatorState_t *state) {
-#if (RVE_AVR_E_LINUX == 1)
+#if (RVE_AVR_LINUX == 1)
     (void)state;
     return;
 #endif
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
     printf_P(PSTR("BREAK at 0x%08" PRIX32 ". Stop.\n"),
              state->programcounter);
 #endif

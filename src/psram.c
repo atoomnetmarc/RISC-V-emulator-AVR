@@ -17,7 +17,7 @@
 inline void psram_init(void) {
     psram_reset();
 
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
     psram_eid_u eid = {0};
     psram_read_eid(&eid);
 

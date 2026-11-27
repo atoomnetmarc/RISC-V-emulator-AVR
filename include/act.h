@@ -11,7 +11,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#if (RVE_AVR_E_ACT == 1)
+#if (RVE_AVR_ACT == 1)
 
 // The RISC-V address the ACT test writes its result to.
 #define RVMODEL_HALT_ADDRESS 0x02000000

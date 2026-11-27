@@ -5,7 +5,7 @@
  *
  */
 
-#if (RVE_AVR_E_LINUX == 1)
+#if (RVE_AVR_LINUX == 1)
 
 #include "vpi.h"
 

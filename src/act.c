@@ -7,7 +7,7 @@
 
 #include "act.h"
 
-#if (RVE_AVR_E_ACT == 1)
+#if (RVE_AVR_ACT == 1)
 
 #include <stdio.h>
 
@@ -34,7 +34,7 @@ void act_init(void) {
     // Undefined exit status: the host treats 0xFF as "no halt store happened".
     VPI_EXIT = 0xFF;
 
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
     printf_P(PSTR("ACT mode: VPI-backed RAM at 0x%08lX\n"), (unsigned long)RAM_ORIGIN);
 #endif
 }
@@ -74,7 +74,7 @@ bool act_halt(uint32_t address, const void *source, uint8_t length) {
         value |= (uint32_t)*(uint8_t *)(source + i) << (8 * i);
     }
 
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
     printf_P(PSTR("Halt: result 0x%08lX after %lu instructions\n"),
              (unsigned long)value,
              (unsigned long)RiscvEmulatorInstructionCounter);

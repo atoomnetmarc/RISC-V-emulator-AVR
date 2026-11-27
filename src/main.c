@@ -27,79 +27,79 @@
 #include "tft.h"
 #include "uart.h"
 
-#if (RVE_AVR_E_LINUX == 1)
+#if (RVE_AVR_LINUX == 1)
 #include "linux.h"
 #include "snapshot.h"
 #include "vpi.h"
 #endif
 
 RiscvEmulatorState_t RiscvEmulatorState;
-#if (RVE_AVR_E_LINUX == 1)
+#if (RVE_AVR_LINUX == 1)
 uint64_t RiscvEmulatorInstructionCount;
 #endif
 
 __attribute__((OS_main)) int main(void) {
-#if (RVE_AVR_E_ACT == 0) && (RVE_AVR_E_LINUX == 0)
+#if (RVE_AVR_ACT == 0) && (RVE_AVR_LINUX == 0)
     led_init();
 #endif
 
     sei();
     uart_init();
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
     printf_P(PSTR("\n\nHello!\n"));
 #endif
-#if (RVE_AVR_E_ACT == 1)
+#if (RVE_AVR_ACT == 1)
     act_init();
 #endif
 
-#if (RVE_AVR_E_ACT == 0) && (RVE_AVR_E_LINUX == 0)
+#if (RVE_AVR_ACT == 0) && (RVE_AVR_LINUX == 0)
 
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
     printf_P(PSTR("Initialize SPI\n"));
 #endif
     spi_init();
 
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
     printf_P(PSTR("Initialize PSRAM\n"));
 #endif
     psram_init();
 
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
     printf_P(PSTR("Initialize FLASH\n"));
 #endif
     flash_init();
 
-#if RVE_AVR_E_TFT == 1
-#if (RVE_AVR_E_VERBOSE == 1)
+#if RVE_AVR_TFT == 1
+#if (RVE_AVR_VERBOSE == 1)
     printf_P(PSTR("Initialize TFT\n"));
 #endif
     tft_init();
 #endif
 
-#if (RVE_AVR_E_FATFS == 1)
+#if (RVE_AVR_FATFS == 1)
     BYTE buff[512]; // Must be power of 2 and maximal 1 flash sector size(4096)
     UINT br;
     BYTE res;
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
     printf_P(PSTR("Initialize SD-card\n"));
 #endif
 
     res = mmc_disk_initialize();
     if (res != RES_OK) {
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
         printf_P(PSTR("SD-card initialize fail. DRESULT: 0x%02X. Stop.\n"), res);
 #endif
         for (;;) {
         }
     }
 
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
     printf_P(PSTR("Mount SD-card\n"));
 #endif
     FATFS fs;
     res = pf_mount(&fs);
     if (res != FR_OK) {
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
         printf_P(PSTR("SD-card mount fail. FRESULT: 0x%02X. Stop.\n"), res);
 #endif
         for (;;) {
@@ -107,7 +107,7 @@ __attribute__((OS_main)) int main(void) {
     }
 
 #if (PF_USE_DIR == 1 && \
-     RVE_AVR_E_VERBOSE == 1)
+     RVE_AVR_VERBOSE == 1)
     DIR dir;
     FILINFO fno;
     char *path = "";
@@ -128,12 +128,12 @@ __attribute__((OS_main)) int main(void) {
     }
 #endif
 
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
     printf_P(PSTR("Read MOTD.TXT\n"));
 #endif
     res = pf_open("MOTD.TXT");
     if (res != FR_OK) {
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
         printf_P(PSTR("Read MOTD.TXT fail. FRESULT: 0x%02X.\n"), res);
 #endif
     } else {
@@ -146,26 +146,26 @@ __attribute__((OS_main)) int main(void) {
     }
 
 #if (1)
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
     printf_P(PSTR("Read FIRMWARE.BIN\n"));
 #endif
     res = pf_open("FIRMWARE.BIN");
     if (res != FR_OK) {
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
         printf_P(PSTR("Read FIRMWARE.BIN fail. FRESULT: 0x%02X.\n"), res);
 #endif
     } else {
         uint32_t bytecounter = 0;
         do {
             if ((bytecounter % 0x1000) == 0) {
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
                 printf_P(PSTR("Flash erase sector 0x%08X\n"), bytecounter);
 #endif
                 flash_sector_erase(bytecounter);
             }
 
             res = pf_read(buff, sizeof(buff), &br);
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
             printf_P(PSTR("Flash program 0x%02X bytes at 0x%08X\n"), sizeof(buff), bytecounter);
 #endif
             flash_write(bytecounter, &buff, br);
@@ -179,30 +179,30 @@ __attribute__((OS_main)) int main(void) {
 
 #endif
 
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
     printf_P(PSTR("RiscvEmulatorInit\n"));
 #endif
-    RiscvEmulatorInit(&RiscvEmulatorState, RVE_AVR_E_RAM_LENGTH);
+    RiscvEmulatorInit(&RiscvEmulatorState, RVE_AVR_RAM_LENGTH);
 
-#if (RVE_AVR_E_ACT == 1)
+#if (RVE_AVR_ACT == 1)
     // The test binary lives in the VPI-backed RAM, not in ROM.
     RiscvEmulatorState.programcounter = RAM_ORIGIN;
     RiscvEmulatorState.programcounternext = RAM_ORIGIN;
 #endif
 
-#if (RVE_AVR_E_LINUX == 1)
+#if (RVE_AVR_LINUX == 1)
     linux_init();
     RiscvEmulatorState.reg.a0 = 0;
-    RiscvEmulatorState.reg.a1 = RVE_AVR_E_DTB_ADDRESS;
-    RiscvEmulatorState.programcounter = RVE_AVR_E_START_ADDRESS;
-    RiscvEmulatorState.programcounternext = RVE_AVR_E_START_ADDRESS;
+    RiscvEmulatorState.reg.a1 = RVE_AVR_DTB_ADDRESS;
+    RiscvEmulatorState.programcounter = RVE_AVR_START_ADDRESS;
+    RiscvEmulatorState.programcounternext = RVE_AVR_START_ADDRESS;
 #endif
 
     for (;;) {
-#if (RVE_AVR_E_ACT == 0) && (RVE_AVR_E_LINUX == 0)
+#if (RVE_AVR_ACT == 0) && (RVE_AVR_LINUX == 0)
         PORTA ^= _BV(PA0);
 #endif
-#if (RVE_AVR_E_LINUX == 1)
+#if (RVE_AVR_LINUX == 1)
         // RiscvEmulatorLoop() changes waiting; force a fresh read each pass.
         if (*(volatile uint8_t *)&RiscvEmulatorState.waiting != 0) {
             linux_idle();
@@ -211,11 +211,11 @@ __attribute__((OS_main)) int main(void) {
         snapshot_poll();
 #endif
         RiscvEmulatorLoop(&RiscvEmulatorState);
-#if (RVE_AVR_E_LINUX == 1)
+#if (RVE_AVR_LINUX == 1)
         RiscvEmulatorInstructionCount++;
 #endif
 
-#if (RVE_AVR_E_ACT == 1)
+#if (RVE_AVR_ACT == 1)
         act_count_instruction();
 #endif
     }

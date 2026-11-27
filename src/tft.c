@@ -13,7 +13,7 @@
 #include "defines.h"
 #include "spi.h"
 
-#if RVE_AVR_E_TFT == 1
+#if RVE_AVR_TFT == 1
 
 void tft_reset(uint8_t level) {
     if (level) {

@@ -149,7 +149,7 @@
           <ListValues>
             <Value>DEBUG</Value>
             <Value>RVE_E_M=1</Value>
-            <Value>RVE_E_ZICSR=1</Value>
+            <Value>RVE_E_Zicsr=1</Value>
           </ListValues>
         </avrgcc.compiler.symbols.DefSymbols>
         <avrgcc.compiler.directories.IncludePaths>
@@ -308,7 +308,7 @@
           <ListValues>
             <Value>DEBUG</Value>
             <Value>F_CPU=20000000UL</Value>
-            <Value>RVE_E_ZICSR=1</Value>
+            <Value>RVE_E_Zicsr=1</Value>
           </ListValues>
         </avrgcc.compiler.symbols.DefSymbols>
         <avrgcc.compiler.directories.IncludePaths>
@@ -390,7 +390,7 @@
             <Value>F_CPU=20000000UL</Value>
             <Value>RVE_E_M=1</Value>
             <Value>RVE_E_A=1</Value>
-            <Value>RVE_E_ZICSR=1</Value>
+            <Value>RVE_E_Zicsr=1</Value>
           </ListValues>
         </avrgcc.compiler.symbols.DefSymbols>
         <avrgcc.compiler.directories.IncludePaths>
@@ -472,11 +472,11 @@
             <Value>F_CPU=20000000UL</Value>
             <Value>RVE_E_M=1</Value>
             <Value>RVE_E_A=1</Value>
-            <Value>RVE_E_ZICSR=1</Value>
-            <Value>RVE_E_ZBA=1</Value>
-            <Value>RVE_E_ZBB=1</Value>
-            <Value>RVE_E_ZBC=1</Value>
-            <Value>RVE_E_ZBS=1</Value>
+            <Value>RVE_E_Zicsr=1</Value>
+            <Value>RVE_E_Zba=1</Value>
+            <Value>RVE_E_Zbb=1</Value>
+            <Value>RVE_E_Zbc=1</Value>
+            <Value>RVE_E_Zbs=1</Value>
           </ListValues>
         </avrgcc.compiler.symbols.DefSymbols>
         <avrgcc.compiler.directories.IncludePaths>
@@ -559,11 +559,11 @@
             <Value>RVE_E_M=1</Value>
             <Value>RVE_E_A=1</Value>
             <Value>RVE_E_C=1</Value>
-            <Value>RVE_E_ZICSR=1</Value>
-            <Value>RVE_E_ZBA=1</Value>
-            <Value>RVE_E_ZBB=1</Value>
-            <Value>RVE_E_ZBC=1</Value>
-            <Value>RVE_E_ZBS=1</Value>
+            <Value>RVE_E_Zicsr=1</Value>
+            <Value>RVE_E_Zba=1</Value>
+            <Value>RVE_E_Zbb=1</Value>
+            <Value>RVE_E_Zbc=1</Value>
+            <Value>RVE_E_Zbs=1</Value>
           </ListValues>
         </avrgcc.compiler.symbols.DefSymbols>
         <avrgcc.compiler.directories.IncludePaths>
@@ -723,9 +723,9 @@
           <ListValues>
             <Value>DEBUG</Value>
             <Value>F_CPU=20000000UL</Value>
-            <Value>RVE_AVR_E_VERBOSE=0</Value>
-            <Value>RVE_AVR_E_FATFS=0</Value>
-            <Value>RVE_AVR_E_TFT=0</Value>
+            <Value>RVE_AVR_VERBOSE=0</Value>
+            <Value>RVE_AVR_FATFS=0</Value>
+            <Value>RVE_AVR_TFT=0</Value>
           </ListValues>
         </avrgcc.compiler.symbols.DefSymbols>
         <avrgcc.compiler.directories.IncludePaths>

@@ -15,7 +15,7 @@
 #include "spi.h"
 
 void flash_init(void) {
-#if (RVE_AVR_E_VERBOSE == 1)
+#if (RVE_AVR_VERBOSE == 1)
     flash_jedec_id_u flash_jedec_id = {0};
     flash_read_jedec_id(&flash_jedec_id);
 
